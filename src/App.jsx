@@ -1,34 +1,79 @@
+import { COLUMNS_NUMBER } from './config'
+import CellsRow from './components/CellsRow'
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const CATEGORY = 'BANCO'
+  const WORD = 'FILA'
+  const [activeRowIndex, setActiveRowIndex] = useState(0)
+  const [activeColumnIndex, setActiveColumnIndex] = useState(0)
+  const [matrixMap, setMatrixMap] = useState(() => {
+    return [...Array(COLUMNS_NUMBER).keys()].map(() => {
+      return [...Array(WORD.length).keys()].map(() => [])
+    })
+  })
+
+  const setNextActiveRow = () => {
+    setActiveRowIndex(activeRowIndex + 1)
+  }
+
+  const handleCellValueChange = (value) => {
+    if (!value || value === '') return
+
+    const matrixDrat = [...matrixMap]
+    matrixDrat[activeRowIndex][activeColumnIndex].value = value
+    setMatrixMap(matrixMap)
+    setActiveColumnIndex(prevActiveColumnIndex => {
+      const nextActiveIndex = prevActiveColumnIndex + 1
+      const diff = (nextActiveIndex) - prevActiveColumnIndex
+      if (diff === 1 && nextActiveIndex <= WORD.length - 1) {
+        return prevActiveColumnIndex + 1
+      }
+
+      return prevActiveColumnIndex
+    })
+  }
+
+  const changeActiveCell = (newCellIndex) => {
+    if (newCellIndex <= WORD.length - 1) {
+      setActiveColumnIndex(newCellIndex)
+    }
+  }
 
   return (
-    <>
+    <div className='flex flex-col justify-center items-center w-screen h-screen gap-y-2'>
+      <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h3 className='font-semibold'>{CATEGORY}</h3>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className='flex gap-x-3'>
+        <h4>
+          Row: <span>{activeRowIndex}</span>
+        </h4>
+        <h4>
+          Column: <span>{activeColumnIndex}</span>
+        </h4>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+        {[...Array(COLUMNS_NUMBER).keys()].map((column, index) => {
+        return (
+          <CellsRow
+            word={WORD}
+            matrix={matrixMap}
+            setMatrixMap={setMatrixMap}
+            wordLength={WORD.length}
+            activeRowIndex={activeRowIndex}
+            isRowActive={activeRowIndex === index}
+            activeColumnIndex={activeColumnIndex}
+            handleCellValueChange={handleCellValueChange}
+            changeActiveCell={changeActiveCell}
+            setNextActiveRow={setNextActiveRow}
+            rowIndex={index}
+            key={index}
+          />
+        )
+      })}
+      </>
+    </div>
   )
 }
 
