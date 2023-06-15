@@ -17,6 +17,7 @@ const Cell = ({
 
   const handleSpecialKey = (key) => {
     const SPECIAL_KEYS_ALLOWED = {
+      SPACE: ' ',
       BACKSPACE: 'Backspace',
       ENTER: 'Enter',
       TAB: 'Tab'
@@ -25,6 +26,7 @@ const Cell = ({
     switch (key) {
       case SPECIAL_KEYS_ALLOWED.BACKSPACE:
         setValue('')
+        changeActiveCell(cellIndex - 1)  
         break
 
       case SPECIAL_KEYS_ALLOWED.ENTER:
@@ -32,6 +34,10 @@ const Cell = ({
         break
 
       case SPECIAL_KEYS_ALLOWED.TAB:
+        changeActiveCell(cellIndex + 1)
+        break
+
+      case SPECIAL_KEYS_ALLOWED.SPACE:
         changeActiveCell(cellIndex + 1)
         break
     }
