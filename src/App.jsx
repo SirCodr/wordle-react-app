@@ -30,7 +30,7 @@ function App() {
   const loadMatchWord = async () => {
     try {
         dispatch(gameActions.setGameLoading(true))
-        // const response = await fetchRandomWordByCategory()
+        const response = await fetchRandomWordByCategory(matchCategory)
         // if (response) dispatch(gameActions.setWord(response.toUpperCase()))
         dispatch(gameActions.setWord('TABLA'))
       } catch (error) {
