@@ -1,115 +1,59 @@
 import { COLUMNS_NUMBER } from './config'
 import CellsRow from './components/CellsRow'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { fetchRandomWordByCategory } from './services/wordGenerator'
 import { toast } from 'react-toastify'
+import { useAppDispatch, useAppSelector } from './hooks/useApp'
+import { gameActions } from './store/game/gameSlice'
 
 function App() {
-  const CATEGORY = 'BANCO'
-  const [word, setWord] = useState('')
-  const [activeRowIndex, setActiveRowIndex] = useState(0)
-  const [activeColumnIndex, setActiveColumnIndex] = useState(0)
-  const initialMatrixMap = [...Array(COLUMNS_NUMBER).keys()].map(() => {
-    return [...Array(word.length).keys()].map(() => [
-      {
-        value: '',
-        completed: null,
-        missLocated: null,
-        notFound: null
-      }
-    ])
-  })
-  const [matrixMap, setMatrixMap] = useState([])
-  const [isLoading, setLoading] = useState(false)
+  const { match: { category: matchCategory, word: matchWord, board: { matrix, activeRow, activeColumn } }, isLoading } = useAppSelector(state => state.game)
+  const dispatch = useAppDispatch()
 
-  const setNextActiveRow = () => {
-    setActiveRowIndex(activeRowIndex + 1)
-  }
-
-  const handleCellValueChange = (value) => {
-    if (!value || value === '') return
-
-    const matrixDrat = [...matrixMap]
-    matrixDrat[activeRowIndex][activeColumnIndex].value = value
-    setMatrixMap(matrixMap)
-    setActiveColumnIndex((prevActiveColumnIndex) => {
-      const nextActiveIndex = prevActiveColumnIndex + 1
-      const diff = nextActiveIndex - prevActiveColumnIndex
-      if (diff === 1 && nextActiveIndex <= word.length - 1) {
-        return prevActiveColumnIndex + 1
-      }
-
-      return prevActiveColumnIndex
-    })
-  }
-
-  const changeActiveCell = (newCellIndex) => {
-    if (newCellIndex <= word.length - 1 && newCellIndex >= 0) {
-      setActiveColumnIndex(newCellIndex)
-    }
-  }
-
-  const resetMatrix = () => setMatrixMap(initialMatrixMap)
+  const resetMatrix = () => dispatch(gameActions.initMatrixBoard())
 
   useEffect(() => {
-    if (word && word.length) {
-      const newMatrix = [...Array(COLUMNS_NUMBER).keys()].map(() => {
-        return [...Array(word.length).keys()].map(() => [{
-          value: '',
-          completed: null,
-          missLocated: null,
-          notFound: null
-        }])
-      })
-      setMatrixMap(newMatrix)
+    if (matchWord && matchWord.length) {
+      dispatch(gameActions.initMatrixBoard())
     }
-  }, [word])
+  }, [matchWord])
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true)
-        const response = await fetchRandomWordByCategory()
-        if (response) setWord(response.toUpperCase())
+        dispatch(gameActions.setGameLoading(true))
+        // const response = await fetchRandomWordByCategory()
+        // if (response) dispatch(gameActions.setWord(response.toUpperCase()))
+        dispatch(gameActions.setWord('DINERO'))
       } catch (error) {
         toast.error('Error on word load')
         console.error('Error on word load: ', error)
       } finally {
-        setLoading(false)
+        dispatch(gameActions.setGameLoading(false))
       }
     }
     if (!isLoading) load()
   }, [])
 
-  if (!word || !word.length || !matrixMap || !matrixMap.length) return 'Cargando...'
+  if (!matchWord || !matchWord.length || !matrix || !matrix.length) return 'Cargando...'
 
   return (
     <div className='flex flex-col justify-center items-center w-screen h-screen gap-y-2'>
       <>
         <div>
-          <h3 className='font-semibold'>{CATEGORY}</h3>
+          <h3 className='font-semibold'>{matchCategory}</h3>
         </div>
         <div className='flex gap-x-3'>
           <h4>
-            Row: <span>{activeRowIndex}</span>
+            Row: <span>{activeRow}</span>
           </h4>
           <h4>
-            Column: <span>{activeColumnIndex}</span>
+            Column: <span>{activeColumn}</span>
           </h4>
         </div>
         {[...Array(COLUMNS_NUMBER).keys()].map((column, index) => {
           return (
             <CellsRow
-              word={word}
-              matrix={matrixMap}
-              setMatrixMap={setMatrixMap}
-              wordLength={word.length}
-              activeRowIndex={activeRowIndex}
-              isRowActive={activeRowIndex === index}
-              activeColumnIndex={activeColumnIndex}
-              handleCellValueChange={handleCellValueChange}
-              changeActiveCell={changeActiveCell}
-              setNextActiveRow={setNextActiveRow}
               rowIndex={index}
               key={index}
             />
