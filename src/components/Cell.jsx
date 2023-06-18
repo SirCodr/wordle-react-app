@@ -59,8 +59,6 @@ const Cell = ({
   }
 
   const handleCellValueChange = (value) => {
-    if (!value || value === '') return
-
     dispatch(
       gameActions.setPlayInMatrixCell({
         row: rowIndex,
@@ -68,6 +66,8 @@ const Cell = ({
         value
       })
     )
+    if (!value || value === '') return false
+
     const newColumnIndex = () => {
       const nextActiveIndex = activeColumn + 1
       const diff = nextActiveIndex - activeColumn
