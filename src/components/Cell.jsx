@@ -36,7 +36,7 @@ const Cell = ({
       buttonRef.current.onkeyup = null
       buttonRef.current.onclick = null
     }
-  }, [isRowActive, isColumnActive])
+  }, [matrix, isRowActive, isColumnActive])
 
   return (
     <button
