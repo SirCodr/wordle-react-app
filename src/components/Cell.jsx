@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../hooks/useApp'
 import { gameActions } from '../store/game/gameSlice'
 
@@ -12,7 +12,6 @@ const Cell = ({
   const isColumnActive = useMemo(() => columnIndex === activeColumn, [activeColumn, columnIndex])
   const cell = useMemo(() => matrix[rowIndex][columnIndex], [matrix, rowIndex, columnIndex])
   const dispatch = useAppDispatch()
-  const [value, setValue] = useState('')
   const buttonRef = useRef()
 
   const handleWordValidation = () => {
@@ -34,7 +33,7 @@ const Cell = ({
 
     switch (key) {
       case SPECIAL_KEYS_ALLOWED.BACKSPACE:
-        setValue('')
+        handleCellValueChange('')
         changeActiveCell(columnIndex - 1)  
         break
 
@@ -56,7 +55,7 @@ const Cell = ({
     if (keyValue.length > 1 || !keyValue?.match(/[A-Z]/))
       return handleSpecialKey(event.key)
 
-    setValue(keyValue)
+    handleCellValueChange(keyValue)
   }
 
   const handleCellValueChange = (value) => {
@@ -64,8 +63,8 @@ const Cell = ({
 
     dispatch(
       gameActions.setPlayInMatrixCell({
-        row: activeRow,
-        column: activeColumn,
+        row: rowIndex,
+        column: columnIndex,
         value
       })
     )
@@ -100,10 +99,6 @@ const Cell = ({
     }
   }, [isRowActive, isColumnActive])
 
-  useEffect(() => {
-    handleCellValueChange(value)
-  }, [value])
-
   return (
     <button
       className={`w-10 h-10 border focus:bg-blue-500 focus:text-white
@@ -113,7 +108,7 @@ const Cell = ({
       ref={buttonRef}
       disabled={!isRowActive}
     >
-      {value}
+      {cell.value}
     </button>
   )
 }
