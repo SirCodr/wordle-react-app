@@ -10,7 +10,11 @@ function App() {
   const { match: { category: matchCategory, word: matchWord, board: { matrix, activeRow, activeColumn } }, isLoading } = useAppSelector(state => state.game)
   const dispatch = useAppDispatch()
 
-  const resetMatrix = () => dispatch(gameActions.initMatrixBoard())
+  const resetMatrix = () => {
+    dispatch(gameActions.initMatrixBoard())
+    dispatch(gameActions.setActiveRow(0))
+    dispatch(gameActions.setActiveColumn(0))
+  }
 
   useEffect(() => {
     if (matchWord && matchWord.length) {
