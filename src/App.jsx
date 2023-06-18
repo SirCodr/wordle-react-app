@@ -4,9 +4,12 @@ import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from './hooks/useApp'
 import { gameActions } from './store/game/gameSlice'
 import Board from './components/Board'
+import useLocalStorage from './hooks/useLocalStorage'
 
 function App() {
-  const { match: { category: matchCategory, word: matchWord, board: { matrix, activeRow, activeColumn } }, isLoading } = useAppSelector(state => state.game)
+  const game = useAppSelector(state => state.game)
+  const { match: { category: matchCategory, word: matchWord, board: { matrix, activeRow, activeColumn } }, isLoading } = game
+  const { LOCAL_ITEMS, getLocalItem, setLocalItem } = useLocalStorage()
   const dispatch = useAppDispatch()
 
   const resetMatrix = () => {
@@ -30,7 +33,7 @@ function App() {
   const loadMatchWord = async () => {
     try {
         dispatch(gameActions.setGameLoading(true))
-        const response = await fetchRandomWordByCategory(matchCategory)
+        // const response = await fetchRandomWordByCategory(matchCategory)
         // if (response) dispatch(gameActions.setWord(response.toUpperCase()))
         dispatch(gameActions.setWord('TABLA'))
       } catch (error) {
@@ -42,9 +45,21 @@ function App() {
   }
 
   const initGame = async () => {
-    loadMatchCategory()
-    await loadMatchWord()
+    const gameInLocalStorage = getLocalItem(LOCAL_ITEMS.GAME, true)
+
+    if (gameInLocalStorage && gameInLocalStorage.match.word) {
+      dispatch(gameActions.setWord(gameInLocalStorage.match.word))
+    } else {
+      loadMatchCategory()
+      await loadMatchWord()
+    }
   }
+
+  // useEffect(() => {
+  //   if (game.match.word) {
+  //     setLocalItem(LOCAL_ITEMS.GAME, JSON.stringify(game))
+  //   }
+  // }, [game])
 
   useEffect(() => {
     if (matchWord && matchWord.length) {
