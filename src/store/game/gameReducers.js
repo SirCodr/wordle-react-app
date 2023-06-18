@@ -1,4 +1,3 @@
-import { current } from '@reduxjs/toolkit'
 import { COLUMNS_NUMBER } from '../../config'
 
 export const gameReducers = {
@@ -63,7 +62,12 @@ export const gameReducers = {
 
     if (activeRow + 1 <= word.length - 1) {
       state.match.board.activeRow = activeRow + 1
+      state.match.board.activeColumn = 0
     }
-    state.match.board.activeColumn = 0
+
+    if (lettersSuccessfullyFound !== word.length && activeRow + 1 >= word.length - 1) {
+      state.isFinished = true
+      state.isSuccessfullyCompleted = false
+    }
   }
 }
