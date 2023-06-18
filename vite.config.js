@@ -5,14 +5,20 @@ import * as path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: [
-    {
-      find: '@components',
-      replacement: path.resolve(__dirname, 'src/components')
-    },
-    {
-      find: '@hooks',
-      replacement: path.resolve(__dirname, 'src/hooks')
-    }
-  ]
+  resolve: {
+    alias: [
+      {
+        find: '@components',
+        replacement: path.resolve(__dirname, 'src/components')
+      },
+      {
+        find: '@hooks',
+        replacement: path.resolve(__dirname, 'src/hooks')
+      },
+      {
+        find: '@store',
+        replacement: path.resolve(__dirname, 'src/store')
+      }
+    ]
+  }
 })
