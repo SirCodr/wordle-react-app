@@ -1,10 +1,9 @@
-import { COLUMNS_NUMBER } from './config'
-import CellsRow from './components/CellsRow'
 import { useEffect } from 'react'
 import { fetchRandomWordByCategory } from './services/wordGenerator'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from './hooks/useApp'
 import { gameActions } from './store/game/gameSlice'
+import Board from './components/Board'
 
 function App() {
   const { match: { category: matchCategory, word: matchWord, board: { matrix, activeRow, activeColumn } }, isLoading } = useAppSelector(state => state.game)
@@ -16,6 +15,37 @@ function App() {
     dispatch(gameActions.setActiveColumn(0))
   }
 
+  const loadMatchCategory = () => {
+    try {
+        dispatch(gameActions.setGameLoading(true))
+        dispatch(gameActions.setCategoryMatch('Colegio'))
+      } catch (error) {
+        toast.error('Error on category load')
+        console.error('Error on category load: ', error)
+      } finally {
+        dispatch(gameActions.setGameLoading(false))
+      }
+  }
+
+  const loadMatchWord = async () => {
+    try {
+        dispatch(gameActions.setGameLoading(true))
+        // const response = await fetchRandomWordByCategory()
+        // if (response) dispatch(gameActions.setWord(response.toUpperCase()))
+        dispatch(gameActions.setWord('TABLA'))
+      } catch (error) {
+        toast.error('Error on word load')
+        console.error('Error on word load: ', error)
+      } finally {
+        dispatch(gameActions.setGameLoading(false))
+      }
+  }
+
+  const initGame = async () => {
+    loadMatchCategory()
+    await loadMatchWord()
+  }
+
   useEffect(() => {
     if (matchWord && matchWord.length) {
       dispatch(gameActions.initMatrixBoard())
@@ -23,20 +53,7 @@ function App() {
   }, [matchWord])
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        dispatch(gameActions.setGameLoading(true))
-        // const response = await fetchRandomWordByCategory()
-        // if (response) dispatch(gameActions.setWord(response.toUpperCase()))
-        dispatch(gameActions.setWord('DINERO'))
-      } catch (error) {
-        toast.error('Error on word load')
-        console.error('Error on word load: ', error)
-      } finally {
-        dispatch(gameActions.setGameLoading(false))
-      }
-    }
-    if (!isLoading) load()
+    if (!isLoading) initGame()
   }, [])
 
   if (!matchWord || !matchWord.length || !matrix || !matrix.length) return 'Cargando...'
@@ -55,14 +72,7 @@ function App() {
             Column: <span>{activeColumn}</span>
           </h4>
         </div>
-        {[...Array(COLUMNS_NUMBER).keys()].map((column, index) => {
-          return (
-            <CellsRow
-              rowIndex={index}
-              key={index}
-            />
-          )
-        })}
+        <Board />
         <div>
           <button
             type='button'
