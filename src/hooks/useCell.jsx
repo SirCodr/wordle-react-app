@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useAppDispatch } from './useApp'
 import { gameActions } from '../store/game/gameSlice'
+import { toast } from 'react-toastify'
 
 const useCell = ({
   rowIndex,
@@ -27,6 +28,10 @@ const useCell = ({
   const dispatch = useAppDispatch()
 
   const handleWordValidation = () => {
+    const allLettersSetted = matrix[activeRow].every(item => item.value.trim() !== '')
+    
+    if (!allLettersSetted) return toast.warn('Complete all letters')
+
     dispatch(gameActions.validateWord())
   }
 
