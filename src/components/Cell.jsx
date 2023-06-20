@@ -41,9 +41,10 @@ const Cell = ({
   return (
     <button
       className={`w-10 h-10 border focus:bg-blue-500 focus:text-white
-      ${cell.wellLocated ? 'bg-green-600' : ''}
-      ${cell.wellLocated === false ? 'bg-gray-500' : ''}
-      ${cell.found === false ? 'bg-red-500' : ''}`}
+      ${!cell.wellLocated && !cell.found && !isRowActive && 'bg-gray-50'}
+      ${cell.wellLocated && 'bg-green-600'}
+      ${cell.wellLocated === false && 'bg-gray-500'}
+      ${cell.found === false && 'bg-red-500'}`}
       ref={buttonRef}
       disabled={!isRowActive}
     >
