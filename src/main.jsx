@@ -6,12 +6,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import { store } from './store'
 import { Provider } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
-      <ToastContainer autoClose={600} newestOnTop hideProgressBar />
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ToastContainer autoClose={600} newestOnTop hideProgressBar />
+      </QueryClientProvider>
     </Provider>
   </React.StrictMode>,
 )
