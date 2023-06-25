@@ -11,5 +11,14 @@ export const fetchRandomWordByCategory = async (category) => {
     model: "gpt-3.5-turbo-16k",
     messages: [{ role: "system", content: `generame una palabra en español, de máximo 6 letras sin tildes; que encaje en la categoria de '${category}'; que represente un objeto, acción o actividad. La respuesta solo debe retornar la palabra`}],
 })
-return response.data?.choices[0]?.message?.content
+  return response.data?.choices[0]?.message?.content
+}
+
+export const fetchRandomCategory = async () => {
+  const openai = new OpenAIApi(configuration)
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo-16k",
+    messages: [{ role: "system", content: `generame una frase o palabra que sea una categoria para un juego de wordle. La respuesta solo debe ser la categoria`}],
+})
+  return response.data?.choices[0]?.message?.content
 }
