@@ -13,26 +13,13 @@ function App() {
   const { LOCAL_ITEMS, getLocalItem, setLocalItem } = useLocalStorage()
   const dispatch = useAppDispatch()
 
-  const { isLoading: isMatchCategoryLoading, error: matchCategoryError, data: matchCategoryData } = useQuery('matchCategory', fetchRandomCategory)
-
-  const resetMatrix = () => {
-    dispatch(gameActions.initMatrixBoard())
-    dispatch(gameActions.setActiveRow(0))
-    dispatch(gameActions.setActiveColumn(0))
-  }
-
-  const nextWord = async () => {
-    resetMatrix()
-    loadMatchWord()
-  }
-
   const loadMatchCategory = async () => {
     try {
         dispatch(gameActions.setGameLoading(true))
         const response = await fetchRandomCategory()
         if (response) {
           const categoryInResponse = response.data?.choices[0]?.message?.content?.toUpperCase()
-          dispatch(gameActions.setWord(categoryInResponse))
+          dispatch(gameActions.setCategoryMatch(categoryInResponse))
         } else {
           toast.error('Error on word load')
           console.error('Error on word load')
@@ -43,6 +30,25 @@ function App() {
       } finally {
         dispatch(gameActions.setGameLoading(false))
       }
+  }
+
+  const { isLoading: isMatchCategoryLoading, error: matchCategoryError, data: matchCategoryData } = useQuery({
+    queryKey: ['matchCategory'],
+    queryFn: loadMatchCategory,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false
+  })
+
+  const resetMatrix = () => {
+    dispatch(gameActions.initMatrixBoard())
+    dispatch(gameActions.setActiveRow(0))
+    dispatch(gameActions.setActiveColumn(0))
+  }
+
+  const nextWord = async () => {
+    resetMatrix()
+    loadMatchWord()
   }
 
   const loadMatchWord = async () => {
@@ -81,11 +87,10 @@ function App() {
   // }, [game])
 
   useEffect(() => {
-    if (matchCategoryData && matchCategoryData.trim() !== '') {
-      dispatch(gameActions.setWord(matchCategoryData))
+    if (matchCategory) {
       loadMatchWord()
     }
-  }, [matchCategoryData])
+  }, [matchCategory])
 
   useEffect(() => {
     if (matchWord && matchWord.length) {
@@ -93,13 +98,13 @@ function App() {
     }
   }, [matchWord])
 
-  if (!matchWord || !matchWord.length || !matrix || !matrix.length) return 'Cargando...'
+  if (!matrix) return 'Cargando...'
 
   return (
     <div className='flex flex-col justify-center items-center w-screen h-screen gap-y-2'>
       <>
         <div>
-          <h3 className='font-semibold'>{matchCategoryData}</h3>
+          <h3 className='font-semibold'>{matchCategory}</h3>
         </div>
         <div className='flex gap-x-3'>
           <h4>
