@@ -29,7 +29,7 @@ const Cell = ({
       buttonRef.current.onclick = null
     }
 
-    buttonRef.current.onkeyup = handleKeyChange
+    buttonRef.current.onkeyup = (e) => handleKeyChange(e.key)
     buttonRef.current.onclick = () => {
       changeActiveCell(columnIndex)
     }

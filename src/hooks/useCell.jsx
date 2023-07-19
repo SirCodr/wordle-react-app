@@ -21,7 +21,7 @@ const useCell = ({
   )
 
   const cell = useMemo(
-    () => matrix[rowIndex][columnIndex],
+    () => matrix && matrix.length ? matrix[rowIndex][columnIndex] : null,
     [matrix, rowIndex, columnIndex]
   )
 
@@ -64,15 +64,14 @@ const useCell = ({
     }
   }
 
-  const handleKeyChange = (event) => {
-    const keyValue = event.key?.toUpperCase()
-
+  const handleKeyChange = (keyValue) => {
     if (!keyValue) return
 
-    if (keyValue.length > 1 || !keyValue?.match(/[A-Z]/))
-      return handleSpecialKey(event.key)
+    const keyValueUpperCase = keyValue?.toUpperCase()
+    if (keyValueUpperCase.length > 1 || !keyValueUpperCase?.match(/[A-Z]/))
+      return handleSpecialKey(keyValue)
 
-    handleCellValueChange(keyValue)
+    handleCellValueChange(keyValueUpperCase)
   }
 
   const handleCellValueChange = (value) => {

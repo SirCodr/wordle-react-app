@@ -6,12 +6,25 @@ import { gameActions } from './store/game/gameSlice'
 import Board from './components/Board'
 import useLocalStorage from './hooks/useLocalStorage'
 import { useQuery } from 'react-query'
+import Keyboard from 'react-simple-keyboard';
+import 'react-simple-keyboard/build/css/index.css';
+import useCell from './hooks/useCell'
+
+const layout = {
+  default: [
+    'q w e r t y u i o p Backspace',
+    'a s d f g h j k l ñ',
+    'Enter z x c v b n m'
+  ] }
 
 function App() {
   const game = useAppSelector(state => state.game)
   const { match: { category: matchCategory, word: matchWord, board: { matrix, activeRow, activeColumn } }, isLoading } = game
   const { LOCAL_ITEMS, getLocalItem, setLocalItem } = useLocalStorage()
   const dispatch = useAppDispatch()
+  const {  handleKeyChange } = useCell({
+    rowIndex: activeRow, columnIndex: activeColumn, activeRow, activeColumn, matrix, matchWord
+  })
 
   const loadMatchCategory = async () => {
     try {
@@ -124,6 +137,13 @@ function App() {
             Next question
           </button>
         </div>
+        <Keyboard
+        onKeyPress={handleKeyChange}
+        layout={layout}
+        display={{
+          'Backspace': 'Borrar'
+        }}
+      />
       </>
     </div>
   )
