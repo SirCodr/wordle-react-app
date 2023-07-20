@@ -7,7 +7,7 @@ const Cell = ({
   columnIndex,
   rowIndex
 }) => {
-  const { match: { word : matchWord, board: { matrix, activeRow, activeColumn } } } = useAppSelector(state => state.game)
+  const { match: { word : matchWord, board: { matrix, activeRow, activeColumn } }, isFinished } = useAppSelector(state => state.game)
   const {
     isRowActive,
     isColumnActive,
@@ -45,12 +45,12 @@ const Cell = ({
   return (
     <button
       className={`w-10 h-10 border focus:bg-blue-500 focus:text-white
-      ${cell.wellLocated === null && cell.found === null && !isRowActive && 'bg-gray-50'}
+      ${cell.wellLocated === null && cell.found === null && (!isRowActive || isFinished) && 'bg-gray-50'}
       ${cell.wellLocated && 'bg-green-600'}
       ${cell.wellLocated === false && 'bg-gray-500'}
       ${cell.found === false && 'bg-red-500'}`}
       ref={buttonRef}
-      disabled={!isRowActive}
+      disabled={!isRowActive || isFinished}
     >
       {cell.value}
     </button>
