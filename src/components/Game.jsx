@@ -46,12 +46,19 @@ function Game() {
       }
   }
 
+  const hasPrevGameFinished = () => {
+    const prevGame = getLocalItem(LOCAL_ITEMS.GAME, true)
+
+    return prevGame?.isFinished ?? true
+  }
+
   const { isLoading: isMatchCategoryLoading, error: matchCategoryError, data: matchCategoryData } = useQuery({
     queryKey: ['matchCategory'],
     queryFn: loadMatchCategory,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    refetchOnReconnect: false
+    refetchOnReconnect: false,
+    enabled: hasPrevGameFinished()
   })
 
   const resetMatrix = () => {
@@ -94,20 +101,25 @@ function Game() {
     }
   }
 
-  // useEffect(() => {
-  //   if (game.match.word) {
-  //     setLocalItem(LOCAL_ITEMS.GAME, JSON.stringify(game))
-  //   }
-  // }, [game])
+  useEffect(() => {
+    if (!hasPrevGameFinished()) {
+      const gameFromLocalStorage = getLocalItem('game', true)
+      dispatch(gameActions.setGameMatch(gameFromLocalStorage.match))
+    }
+  }, [])
 
   useEffect(() => {
-    if (matchCategory) {
+    if (matchCategory && matchCategory.length) setLocalItem(LOCAL_ITEMS.GAME, JSON.stringify(game))
+  }, [matrix])
+
+  useEffect(() => {
+    if (matchCategory && hasPrevGameFinished()) {
       loadMatchWord()
     }
   }, [matchCategory])
 
   useEffect(() => {
-    if (matchWord && matchWord.length) {
+    if (matchWord && matchWord.length && hasPrevGameFinished()) {
       dispatch(gameActions.initMatrixBoard())
     }
   }, [matchWord])

@@ -1,6 +1,9 @@
 import { COLUMNS_NUMBER } from '../../config'
 
 export const gameReducers = {
+  setGameMatch: (state, action) => {
+    state.match = action.payload
+  },
   setCategoryMatch: (state, action) => {
     state.match.category = action.payload
   },
@@ -46,7 +49,7 @@ export const gameReducers = {
         const isWellLocated = cell.value === word[index]
         const found = word.includes(cell.value)
 
-        if (found) lettersSuccessfullyFound++
+        if (found && isWellLocated) lettersSuccessfullyFound++
 
         return {
           ...cell,
